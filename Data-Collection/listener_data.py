@@ -1,4 +1,6 @@
+# Charlotte
+
 import requests
 import json
 
-api_key = ""
+def listener_data(api_key): 
