@@ -2,7 +2,7 @@ import sqlite3
 
 def calculations(db_name):
     """
-    Select data from the database and calculate:
+    select data from the database and calculate:
     1. avg concert capacity for each artist
     2. num of concerts for each artist
     3. correlation between listeners and capacities 
