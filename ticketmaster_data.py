@@ -25,8 +25,8 @@ def ticket_data(api_key):
     params = {
         "apikey": api_key,
         "classificationName": "music",
-        "size": 25,
-        "offset": offset  # changed from startPosition
+        "size": 25, # size from project rubric 
+        "offset": offset # start pos 
     }
 
     response = requests.get(base_url, params=params)
