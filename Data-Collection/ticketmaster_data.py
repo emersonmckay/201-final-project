@@ -1,21 +1,16 @@
+# Emerson --> ticketmaster api data 
+
 import requests
 import sqlite3
 
-# will need to update things to match db table 
-
 def ticket_data(api_key):
-    """
-    Fetches Ticketmaster music events and inserts up to 25 new records
-    into the database once created.
-    """
-
-    conn = sqlite3.connect("concert_data.db")
+    conn = sqlite3.connect("ticket_trends.sqlite")
     cur = conn.cursor()
 
     # count existing events so we know the correct start position
     cur.execute("SELECT COUNT(*) FROM events")
     current_count = cur.fetchone()[0]
-    offset = current_count  # changed from start_pos to offset
+    offset = current_count  # start pos
 
     print(f"Currently have {current_count} events.")    
     print(f"Fetching up to 25 new events starting at offset {offset}...\n")
@@ -24,9 +19,10 @@ def ticket_data(api_key):
     base_url = "https://app.ticketmaster.com/discovery/v2/events.json"
     params = {
         "apikey": api_key,
-        "classificationName": "music",
-        "size": 25, # size from project rubric 
-        "offset": offset # start pos 
+        "size": 25,
+        "page": offset // 25,
+        "countryCode": "US",
+        "segmentName": "Music"
     }
 
     response = requests.get(base_url, params=params)
@@ -38,7 +34,7 @@ def ticket_data(api_key):
         return
 
     events = data["_embedded"]["events"]
-    added = 0
+    event_dict = {}
 
     # insert rows into pre-existing tables
     for event in events:
@@ -52,47 +48,50 @@ def ticket_data(api_key):
             if "_embedded" in event and "attractions" in event["_embedded"]:
                 artist_name = event["_embedded"]["attractions"][0].get("name")
 
+            if artist_name:
+                cur.execute("""
+                    INSERT OR IGNORE INTO artists (artist_name, listeners)
+                    VALUES (?, NULL)
+                """, (artist_name,))
+
             # venue info
-            if "_embedded" not in event or "venues" not in event["_embedded"]:
+            if "venues" not in event["_embedded"]:
                 continue
                 
             venue = event["_embedded"]["venues"][0]
-            venue_id = venue.get("id")  # Get the venue_id from API
+            venue_id = venue.get("id")  # get the venue_id from API
             venue_name = venue.get("name")
             city = venue.get("city", {}).get("name")
-            state = venue.get("state", {}).get("stateCode")  # Changed to stateCode
-            capacity = venue.get("capacity", 0)  # Get capacity from venue
+            state = venue.get("state", {}).get("stateCode")
 
-            # INSERT venue (make sure this matches Charlotte's table structure!)
+            # INSERT venue 
             cur.execute("""
-                INSERT OR IGNORE INTO venues (venue_id, venue_name, city, state, capacity)
-                VALUES (?, ?, ?, ?, ?)
-            """, (venue_id, venue_name, city, state, capacity))
+                INSERT OR IGNORE INTO venues (venue_id, venue_name, city, state)
+                VALUES (?, ?, ?, ?)
+            """, (venue_id, venue_name, city, state))
 
-            # INSERT event (removed capacity from here)
+            # event
             cur.execute("""
                 INSERT OR IGNORE INTO events
                 (event_id, event_name, artist_name, date, venue_id)
                 VALUES (?, ?, ?, ?, ?)
             """, (event_id, event_name, artist_name, date, venue_id))
 
-            added += 1
-
+            event_dict[event_name] = {"artist": artist_name}
         except Exception as e:
-            print("Error processing event:", e)
-            continue
+            print("ERROR:", e)
 
     conn.commit()
     conn.close()
-    print(f"Added {added} new events.")
+    return event_dict 
 
 if __name__ == "__main__":
-    API_KEY = "hhTxipVoQr6QL7o35d9NnSwWf7h9h2vU"
+    API_KEY = "lfCVtbiZSWpr7HmZUUGWa8C1chUvuvpU"
 
     print("\nTesting Ticketmaster API data insert...\n")
     ticket_data(API_KEY)
 
-    conn = sqlite3.connect("concert_data.db")
+    conn = sqlite3.connect("ticket_trends.sqlite")
     cur = conn.cursor()
 
     cur.execute("SELECT COUNT(*) FROM events")
