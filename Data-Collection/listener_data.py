@@ -53,7 +53,7 @@ def listener_data(api_key):
             listeners = int(artist.get("listeners", 0))
 
             cur.execute("""
-                INSERT OR IGNORE INTO artistst (artist_name, listeners)
+                INSERT OR IGNORE INTO artists (artist_name, listeners)
                 VALUES (?, ?)
             """, (name, listeners))
 
@@ -62,11 +62,11 @@ def listener_data(api_key):
         except Exception as e:
             print("Error:", e)
 
-        conn.commit()
-        conn.close()
+    conn.commit()
+    conn.close()
 
-        print(f"Added {len(new_artist_dict)} new artists.\n")
-        return new_artist_dict
+    print(f"Added {len(new_artist_dict)} new artists.\n")
+    return new_artist_dict
 
 
 if __name__ == "__main__":
