@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+# Emerson -- Scatterplot
 def create_scatter_plot(calculation_results):
     artists = [row[0] for row in calculation_results]
     listeners = [row[1] for row in calculation_results]
