@@ -1,25 +1,31 @@
+# Emerson 
+
 import sqlite3
 
 def calculations(db_name):
-    """
-    select data from the database and calculate:
-    1. avg concert capacity for each artist
-    2. num of concerts for each artist
-    3. correlation between listeners and capacities 
-    """
 
     conn = sqlite3.connect(db_name)
     cur = conn.cursor()
 
-    # TODO: write sql statements here !
+    # artist name, number of concerts, number of unique venues
+    cur.execute("""
+            SELECT
+                events.artist_name,
+                COUNT(events.event_id) AS num_concerts,
+                COUNT(DISTINCT venues.venue_id) AS num_venues
+            FROM events
+            JOIN venues ON events.venue_id = venues.venue_id
+            GROUP BY events.artist_name
+            ORDER BY num_concerts DESC;       
+            """)
 
+    results = cur.fetchall()
     conn.close()
 
-    return {} 
+    return results
 
 if __name__ == "__main__":
-    # temp test: this will error until the real database exists,
-    # but it's here as a placeholder!
-    db_name = "concerts.db"  # or whatever we decide to name it
-    print(calculations(db_name))
+    db_name = "ticket_trends.sqlite"  
+    print("Artist, num of concerts, and number of unique venues:")
+    print(calculations("ticket_trends.sqlite"))
 
