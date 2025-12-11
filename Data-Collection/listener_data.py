@@ -52,6 +52,16 @@ def listener_data(api_key):
             name = artist.get("name")
             listeners = int(artist.get("listeners", 0))
 
+            info_params = {
+                "method": "artist.getinfo",
+                "artist": name,
+                "api_key": api_key,
+                "format": "json"
+            }
+
+            info_response = requests.get(base_url, params=info_params).json()
+            listeners = int(info_response.get("artist", {}).get("stats", {}).get("listeners", 0))
+
             cur.execute("""
                 INSERT OR IGNORE INTO artists (artist_name, listeners)
                 VALUES (?, ?)
@@ -60,7 +70,7 @@ def listener_data(api_key):
             cur.execute("""
                 UPDATE artists
                 SET listeners = ?
-                WHERE artist_name = ? AND listeners IS NULL OR listeners = 0)
+                WHERE artist_name = ? AND (listeners IS NULL OR listeners = 0)
             """, (listeners, name))
 
             new_artist_dict[name] = listeners 

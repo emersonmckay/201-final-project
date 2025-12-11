@@ -21,7 +21,7 @@ def create_scatter_plot(calculation_results):
     plt.show()
 
         
-
+# Charlotte -- Barchart 
 def create_barchart(calculation_results):
     pass 
 
