@@ -57,6 +57,12 @@ def listener_data(api_key):
                 VALUES (?, ?)
             """, (name, listeners))
 
+            cur.execute("""
+                UPDATE artists
+                SET listeners = ?
+                WHERE artist_name = ? AND listeners IS NULL OR listeners = 0)
+            """, (listeners, name))
+
             new_artist_dict[name] = listeners 
 
         except Exception as e:
