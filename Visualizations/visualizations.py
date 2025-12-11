@@ -18,6 +18,9 @@ def create_scatter_plot(calculation_results):
     plt.ylabel("Number of Concerts (Ticketmaster)")
     plt.grid(True)
     plt.tight_layout()
+    plt.savefig("scatter_plot.png")
+    print("Scatter plot saved as scatter_plot.png")
+
     plt.show()
 
         
@@ -30,22 +33,26 @@ def create_bar_chart(calculation_results):
     x = range(len(artists))
     bar_width = 0.4
 
-    plt.figure(figsize=(14,7))
+    fig, ax1 = plt.subplots(figsize=(18,8))
 
-    # First bar --> listeners
-    plt.bar([p - bar_width/2 for p in x], listeners,
-            width=bar_width, label="Listeners")
-    
-    # Second bar --> number of events 
-    plt.bar([p + bar_width/2 for p in x], events,
-            width=bar_width, label="Number of Events")
+    # First axis for listeners
+    ax1.bar([p - bar_width/2 for p in x], listeners, 
+            width=bar_width, label="Listeners", color="steelblue")
+
+    ax1.set_ylabel("Listeners", color="steelblue")
+    ax1.tick_params(axis='y', labelcolor="steelblue")
+
+    # Second axis for number of events
+    ax2 = ax1.twinx()
+    ax2.bar([p + bar_width/2 for p in x], events, 
+            width=bar_width, label="Number of Events", color="darkorange")
+
+    ax2.set_ylabel("Number of Events", color="darkorange")
+    ax2.tick_params(axis='y', labelcolor="darkorange")
     
     # Titles and labels
     plt.title("Comparison of Artist Listener Count and Event Count")
-    plt.xlabel("Artist")
-    plt.ylabel("Count")
     plt.xticks(x, artists, rotation=45, ha="right")
-    plt.legend()
 
     plt.tight_layout
     plt.savefig("bar_chart.png")
