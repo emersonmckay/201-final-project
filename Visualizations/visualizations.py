@@ -53,7 +53,6 @@ def create_bar_chart(calculation_results):
 
     plt.show()
 
-if __name__ == "__main__":
-    main()
+
 
 

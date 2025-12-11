@@ -34,16 +34,22 @@ def main():
     print("Saving calculation results...")
     write_results(calculation_results)
 
+    # Filtered results
+    filtered_results = [
+        row for row in calculation_results
+        if row[1] is not None and row[1] != 0
+    ]
+
     # Convert results to list of tuples for scatter plot
     scatter_plot_data = [
         (row[0], row[1], row[2])
-        for row in calculation_results
+        for row in filtered_results
     ]
 
     # Convert results to dict for bar chart
     bar_chart_data = {
         row[0]: {"listeners": row[1], "events": row[2]}
-        for row in calculation_results
+        for row in filtered_results
     }
 
     # Create visualizations 

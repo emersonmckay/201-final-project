@@ -17,7 +17,7 @@ def calculations(db_name):
         LEFT JOIN events ON artists.artist_name = events.artist_name
         LEFT JOIN venues ON events.venue_id = venues.venue_id
         GROUP BY artists.artist_name
-        HAVING num_concerts > 0
+        HAVING num_concerts > 0 AND artists.listeners IS NOT NULL
         ORDER BY num_concerts DESC;
     """)
 
