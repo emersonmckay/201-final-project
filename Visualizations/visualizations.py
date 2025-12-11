@@ -22,6 +22,38 @@ def create_scatter_plot(calculation_results):
 
         
 # Charlotte -- Barchart 
-def create_barchart(calculation_results):
-    pass 
+def create_bar_chart(calculation_results):
+    artists = list(calculation_results.keys())
+    listeners = [calculation_results[a]["listeners"] for a in artists]
+    events = [calculation_results[a]["events"] for a in artists]
+
+    x = range(len(artists))
+    bar_width = 0.4
+
+    plt.figure(figsize=(14,7))
+
+    # First bar --> listeners
+    plt.bar([p - bar_width/2 for p in x], listeners,
+            width=bar_width, label="Listeners")
+    
+    # Second bar --> number of events 
+    plt.bar([p + bar_width/2 for p in x], events,
+            width=bar_width, label="Number of Events")
+    
+    # Titles and labels
+    plt.title("Comparison of Artist Listener Count and Event Count")
+    plt.xlabel("Artist")
+    plt.ylabel("Count")
+    plt.xticks(x, artists, rotation=45, ha="right")
+    plt.legend()
+
+    plt.tight_layout
+    plt.savefig("bar_chart.png")
+    print("Bar chart saved as bar_chart.png")
+
+    plt.show()
+
+if __name__ == "__main__":
+    main()
+
 
